@@ -191,4 +191,21 @@ Welcome to Containers By Docker..!!
 
 ```
 
+### getting access with container running shell
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ docker  exec -it ashuc2  bash 
+root@f147be1bd5f3:/# 
+root@f147be1bd5f3:/# 
+root@f147be1bd5f3:/# whoami
+root
+root@f147be1bd5f3:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@f147be1bd5f3:/# cd /mycode/
+root@f147be1bd5f3:/mycode# ls
+ashu.py
+root@f147be1bd5f3:/mycode# exit
+exit
+```
+
 
