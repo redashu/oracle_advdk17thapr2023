@@ -331,4 +331,92 @@ ashu@ip-172-31-31-88 ashu-images]$ docker  run -itd --name ashun1 --memory 400M 
 
 ```
 
+### Docker clients options 
+
+<img src="client.png">
+
+### Networking 
+
+<img src="net.png">
+
+### list of pre-define docker networks 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker  network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+65b63c76e4dc   bridge    bridge    local
+29aa8eb8944e   host      host      local
+0f980e6bee77   none      null      local
+```
+
+
+### Understanding None bridge
+
+<img src="none.png">
+
+### by default containers have network access
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+[ashu@ip-172-31-31-88 ashu-images]$ docker run -it --rm   alpine  sh 
+/ # 
+/ # ifconfig 
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:02  
+          inet addr:172.17.0.2  Bcast:172.17.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:8 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:736 (736.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+/ # ping google.com 
+PING google.com (142.251.163.113): 56 data bytes
+64 bytes from 142.251.163.113: seq=0 ttl=95 time=1.661 ms
+64 bytes from 142.251.163.113: seq=1 ttl=95 time=1.678 ms
+^C
+--- google.com ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 1.661/1.669/1.678 ms
+/ # exit
+```
+
+### container with None network 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+65b63c76e4dc   bridge    bridge    local
+29aa8eb8944e   host      host      local
+0f980e6bee77   none      null      local
+[ashu@ip-172-31-31-88 ashu-images]$ docker run -itd --name ashuc1 --network none  ashutask:v1 
+233219e1cae0143e3ecf2a8cff8a6066b1d11dd8cda91760c9cbc5bf08849aad
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ docker exec -it ashuc1 bash 
+OCI runtime exec failed: exec failed: unable to start container process: exec: "bash": executable file not found in $PATH: unknown
+[ashu@ip-172-31-31-88 ashu-images]$ docker exec -it ashuc1 sh
+/ $ 
+/ $ ping google.com 
+^C
+/ $ ifconfig 
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+/ $ exit
+```
+
+
 
