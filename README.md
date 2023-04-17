@@ -1,1 +1,4 @@
-# oracle_advdk17thapr2023
+### Training plan 
+
+<img src="plan.png">
+
