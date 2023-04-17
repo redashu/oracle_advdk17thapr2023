@@ -106,5 +106,84 @@ java  python  webapp
 
 ```
 
+## Image building options 
+
+<img src="op.png">
+
+### Dockefile for image building purpose 
+
+### python code -- ashu.py 
+
+```
+import time
+
+while True:
+    print("Hello all , welcome to python..!!")
+    time.sleep(3)
+    print("Welcome to Oracle India ..")
+    time.sleep(2)
+    print("Welcome to Containers By Docker..!!")
+    print("______________________")
+    time.sleep(3)
+```
+
+### Dockerfile
+
+```
+FROM python 
+# we are targetting python docker image from docker hub registry 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+# OPtional field but you can use to share image developer details to user
+RUN mkdir /mycode 
+# inside existing python image i am creating a directory 
+# RUN you are asking for shell access 
+COPY ashu.py /mycode/
+# copy is an instruction to copy code into /mycode/
+CMD ["python","/mycode/ashu.py"]
+# CMD is to define process (single process) 
+# when you create container from this image it will start this process
+```
+
+### lets build image
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ ls
+java  python  webapp
+[ashu@ip-172-31-31-88 ashu-images]$ docker build  -t  ashupy:v1     python/ 
+Sending build context to Docker daemon  3.584kB
+Step 1/6 : FROM python
+latest: Pulling from library/python
+b0248cf3e63c: Pull complete 
+127e97b4daf7: Pull complete 
+0336c50c9f69: Pull complete 
+```
+
+### checking image 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED              SIZE
+tejsh        v1        c787061f0590   About a minute ago   921MB
+hemapy       v1        280b1df192f4   About a minute ago   921MB
+naveenpy     v1        5e976659fa2c   About a minute ago   921MB
+ishanpy      v1        52a47ec4b348   2 minutes ago     
+```
+
+### creating containers 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker  run  -it  -d  --name ashuc1  ashupy:v1  
+a4b08906be729aee12521e61608b27fd48971b35397ae807e319aaa58b4524f2
+[ashu@ip-172-31-31-88 ashu-images]$ docker  ps
+CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS         PORTS     NAMES
+a4b08906be72   ashupy:v1   "python /mycode/ashu…"   3 seconds ago   Up 2 seconds             ashuc1
+```
+
+### checking output 
+
+```
+
+```
 
 
