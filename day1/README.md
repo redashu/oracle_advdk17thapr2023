@@ -689,5 +689,20 @@ services:
    - 1234:80 
 ```
 
+### COntainer networking model with different bridge
+
+<img src="brr.png">
+
+### we can create bridges using subnet also
+
+```
+[ashu@ip-172-31-31-88 python]$ docker network create br11
+838e0956512a311603b0cf9743331b9f1bbbdc88cc493a66a2cbb74f85e1ceeb
+[ashu@ip-172-31-31-88 python]$ docker network create br22 --subnet 192.168.10.0/24 
+e4d1adc017b2ad4449d8e4e4449f1a27ca6d6ee4765e574e53f0b14464224f86
+[ashu@ip-172-31-31-88 python]$ 
+```
+
+
 
 
