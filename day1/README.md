@@ -310,5 +310,9 @@ PID   USER     TIME  COMMAND
    14 jack      0:00 ps -e
 / $ exit
 ```
+### Introduction to Control groups in Docker 
+
+<img src="cg.png">
+
 
 
