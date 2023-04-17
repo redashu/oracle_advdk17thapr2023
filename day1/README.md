@@ -573,5 +573,106 @@ alpine           latest     9ed4aefc74f6
         },
 ```
 
+### Installing docker-compose binary 
+
+```
+[root@ip-172-31-31-88 ~]# curl -SL https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o  /usr/bin/docker-compose 
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 51.9M  100 51.9M    0     0  75.2M      0 --:--:-- --:--:-- --:--:--  102M
+[root@ip-172-31-31-88 ~]# 
+[root@ip-172-31-31-88 ~]# 
+[root@ip-172-31-31-88 ~]# chmod +x /usr/bin/docker-compose 
+[root@ip-172-31-31-88 ~]# 
+[root@ip-172-31-31-88 ~]# 
+
+
+```
+
+### verify 
+
+```
+[ashu@ip-172-31-31-88 webapp]$ docker-compose  version 
+Docker Compose version v2.17.2
+[ashu@ip-172-31-31-88 webapp]$ 
+
+
+```
+
+## Docker-compose file version and concept 
+
+<img src="dfile.png">
+
+## sample Docker-compose file 
+
+```
+version: '3.8'
+services: 
+  ashu-webui: # NAME OF service 
+   image: ashunginx:v11 # name of image i want to build 
+   build: . # location where dockerfile is present 
+   container_name: ashucc11 # name of container you want to create
+   ports: # port forwarding 
+   - 1234:80 
+```
+
+### lets run it 
+
+```
+[ashu@ip-172-31-31-88 webapp]$ ls
+Dockerfile  docker-compose.yaml  project-html-website
+[ashu@ip-172-31-31-88 webapp]$ docker-compose up -d 
+[+] Running 1/0
+ ! ashu-webui Warning                                                                                           0.1s 
+[+] Building 0.4s (7/7) FINISHED                                                                                     
+ => [internal] load build definition from Dockerfile                                                            0.0s
+ => => transferring dockerfile: 367B                                                                            0.0s
+ => [internal] load .dockerignore                                                                               0.1s
+ => => transferring context: 2B                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/nginx:latest                                                 0.0s
+ => [internal] load build context                                                                               0.1s
+ => => transferring context: 1.34MB                                                                             0.0s
+ => [1/2] FROM docker.io/library/nginx                                                                          0.2s
+ => [2/2] COPY project-html-website  /usr/share/nginx/html/                                                     0.1s
+ => exporting to image                                                                                          0.1s
+ => => exporting layers                                                                                         0.0s
+ => => writing image sha256:50f4ca5c96cc81043af88d732fd816b0406a7a9a64626aaadeb678f9998802b6                    0.0s
+ => => naming to docker.io/library/ashunginx:v11                                                                0.0s
+[+] Running 2/2
+ ✔ Network webapp_default  Created                                                                              0.1s 
+ ✔ Container ashucc11      Started     
+```
+
+### listing 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ cd ashuwebapp/
+[ashu@ip-172-31-31-88 ashuwebapp]$ ls
+Dockerfile  docker-compose.yaml  project-html-website
+[ashu@ip-172-31-31-88 ashuwebapp]$ docker-compose up -d
+[+] Running 2/2
+ ✔ Network ashuwebapp_default  Created                                                                          0.1s 
+ ✔ Container ashucc11          Started                                                                          0.7s 
+[ashu@ip-172-31-31-88 ashuwebapp]$ docker-compose  ps
+NAME                IMAGE               COMMAND                  SERVICE             CREATED             STATUS              PORTS
+ashucc11            ashunginx:v11       "/docker-entrypoint.…"   ashu-webui          7 seconds ago       Up 5 seconds        0.0.0.0:1234->80/tcp, :::1234->80/tcp
+[ashu@ip-172-31-31-88 ashuwebapp]$ 
+
+
+```
+
+### remove 
+
+```
+[ashu@ip-172-31-31-88 ashuwebapp]$ docker-compose down 
+[+] Running 2/2
+ ✔ Container ashucc11          Removed                                                                          0.5s 
+ ✔ Network ashuwebapp_default  Removed                                                                          0.5s 
+[ashu@ip-172-31-31-88 ashuwebapp]$ 
+
+
+```
+
 
 
