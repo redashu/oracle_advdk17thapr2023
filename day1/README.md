@@ -314,5 +314,21 @@ PID   USER     TIME  COMMAND
 
 <img src="cg.png">
 
+### Cgropus implementations 
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ docker  run -itd --name ashun1 --memory 400M ashutask:v1 
+
+```
+
+### cpu options 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker  run -itd --name ashun2 --memory 600M  --cpu-shares=700    ashutask:v1 
+8488e831b9c5a2ac408cc1cef1008b7a25ff5b3c1614f541e27024393935fb0a
+[ashu@ip-172-31-31-88 ashu-images]$ 
+
+
+```
 
 
