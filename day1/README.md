@@ -674,5 +674,20 @@ ashucc11            ashunginx:v11       "/docker-entrypoint.…"   ashu-webui   
 
 ```
 
+### another yaml 
+
+```
+version: '3.8'
+services: 
+  ashu-webui: # NAME OF service 
+   image: ashunginx:v11 # name of image i want to build 
+   build:  # location where dockerfile is present 
+    context: . # location of dockerfile 
+    dockerfile: a.dockerfile # name of dockerfile 
+   container_name: ashucc11 # name of container you want to create
+   ports: # port forwarding 
+   - 1234:80 
+```
+
 
 
