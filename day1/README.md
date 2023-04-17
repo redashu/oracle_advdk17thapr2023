@@ -418,5 +418,120 @@ lo        Link encap:Local Loopback
 / $ exit
 ```
 
+### Docker bridge inspect 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker  network inspect  bridge 
+[
+    {
+        "Name": "bridge",
+        "Id": "65b63c76e4dcc3a551c2430440bb31d7de5d7bae4cfc46230ee2c1e172dff4f9",
+        "Created": "2023-04-17T04:59:01.806191073Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+```
+
+
+### creating webapp docker image
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ ls
+java  python  webapp
+[ashu@ip-172-31-31-88 ashu-images]$ cd  webapp/
+[ashu@ip-172-31-31-88 webapp]$ touch Dockerfile
+[ashu@ip-172-31-31-88 webapp]$ ls
+Dockerfile
+[ashu@ip-172-31-31-88 webapp]$ git clone https://github.com/microsoft/project-html-website.git
+Cloning into 'project-html-website'...
+remote: Enumerating objects: 24, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 24 (delta 0), reused 3 (delta 0), pack-reused 19
+Receiving objects: 100% (24/24), 465.86 KiB | 22.18 MiB/s, done.
+[ashu@ip-172-31-31-88 webapp]$ ls
+Dockerfile  project-html-website
+[ashu@ip-172-31-31-88 webapp]$ ls project-html-website/
+LICENSE  README.md  SECURITY.md  css  fonts  img  index.html
+[ashu@ip-172-31-31-88 webapp]$ 
+
+```
+
+### Dockerfile
+
+```
+FROM nginx 
+# live webserver image from docker hub 
+LABEL name=ashutoshh
+COPY project-html-website  /usr/share/nginx/html/
+# nginx web server by default use above location to show website 
+# if we don't use CMD / ENTRYPOINT then FROm image process willbe
+# considered
+
+
+```
+
+### build it 
+
+```
+[ashu@ip-172-31-31-88 webapp]$ ls
+Dockerfile  project-html-website
+[ashu@ip-172-31-31-88 webapp]$ docker build -t ashunginx:v1  . 
+Sending build context to Docker daemon  1.375MB
+Step 1/3 : FROM nginx
+latest: Pulling from library/nginx
+26c5c85e47da: Pull complete 
+4f3256bdf66b: Pull complete 
+2019c71d5655: Pull complete 
+8c767bdbc9ae: Pull complete 
+78e14bb05fd3: Pull complete 
+75576236abf5: Pull complete 
+Digest: sha256:63b44e8ddb83d5dd8020327c1f40436e37a6fffd3ef2498a6204df23be6e7e94
+Status: Downloaded newer image for nginx:latest
+ ---> 6efc10a0510f
+Step 2/3 : LABEL name=ashutoshh
+ ---> Running in e99b89ad36eb
+Removing intermediate container e99b89ad36eb
+ ---> 75e282d60e2a
+Step 3/3 : COPY project-html-website  /usr/share/nginx/html/
+ ---> bbe856e6703a
+Successfully built bbe856e6703a
+Successfully tagged ashunginx:v1
+[ashu@ip-172-31-31-88 webapp]$ docker images
+REPOSITORY       TAG        IMAGE ID       CREATED             SIZE
+ashunginx        v1         bbe856e6703a   8 seconds ago       143MB
+hemaassg2        v1         72534c6c7659   52 minutes ago      58.8MB
+ravinderalpine   v1         24179c9934b5   About an hour ago   58.8MB
+naveenalp        pycodev1   1df26a1f0395   2 hours ago         58.8MB
+ashutask         v1         06a36ca3206d   2 hours ago         58.8MB
+sattask          v1         06a36ca3206d   2 hours ago         58.8MB
+<none>           <none>     24881dc3deab   2 hours ago         58.8MB
+ishanalp         pycodev1   bcbdabac3a5d   2 hours ago         58.8MB
+saivisalalp      pycodev1   136dce5700fd   2 hours ago         58.8MB
+<none>           <none>     380ae4f118a3   2 hours ago         921MB
+tejsh            v3         89537b9633d2   2 hours ago         923MB
+<none>           <none>     9f518fd205ac   2 hours ago         921MB
+<none>           <none>     0ef9979a1d30   2 hours ago         923MB
+nginx            latest     6efc10a0510f   5 days ago          142MB
+python           latest     4665a951a37e   5 days ago          921MB
+alpine           latest     9ed4aefc74f6   
+```
 
 
