@@ -84,5 +84,27 @@ docker:x:992:ashu
 
 ```
 
+### setting up image build environment 
+
+```
+[ashu@ip-172-31-31-88 ~]$ whoami
+ashu
+[ashu@ip-172-31-31-88 ~]$ docker  -v
+Docker version 20.10.17, build 100c701
+[ashu@ip-172-31-31-88 ~]$ ls
+[ashu@ip-172-31-31-88 ~]$ mkdir ashu-images
+[ashu@ip-172-31-31-88 ~]$ ls
+ashu-images
+[ashu@ip-172-31-31-88 ~]$ mkdir ashu-images/java
+[ashu@ip-172-31-31-88 ~]$ mkdir ashu-images/python
+[ashu@ip-172-31-31-88 ~]$ mkdir ashu-images/webapp
+[ashu@ip-172-31-31-88 ~]$ ls
+ashu-images
+[ashu@ip-172-31-31-88 ~]$ ls  ashu-images/
+java  python  webapp
+[ashu@ip-172-31-31-88 ~]$ 
+
+```
+
 
 
