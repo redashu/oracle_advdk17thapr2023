@@ -534,4 +534,44 @@ python           latest     4665a951a37e   5 days ago          921MB
 alpine           latest     9ed4aefc74f6   
 ```
 
+### having testing 
+
+```
+[ashu@ip-172-31-31-88 webapp]$ docker  network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "65b63c76e4dcc3a551c2430440bb31d7de5d7bae4cfc46230ee2c1e172dff4f9",
+        "Created": "2023-04-17T04:59:01.806191073Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "2a8cfe095e4efc3f4a00eff9bc0b1a36904726e80f3194adea5691baea2a3194": {
+                "Name": "ashuwebapp",
+                "EndpointID": "e3bdc9aba61e9adbe36fd4957c456b1922e998892144bf9bb78aa8db07613116",
+                "MacAddress": "02:42:ac:11:00:02",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+```
+
+
 
