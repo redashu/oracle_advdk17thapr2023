@@ -234,4 +234,81 @@ Deleted: sha256:77f1c8563ffc57ee580123d38c61f2051985c9787992746299acbb75420f2f48
 [ashu@ip-172-31-31-88 ashu-images]$ 
 ```
 
+### alpine docker python image 
+
+```
+FROM alpine 
+LABEL name=ashutoshh
+RUN apk add python3 && mkdir /code 
+ADD https://raw.githubusercontent.com/redashu/pythonLang/main/while.py /code/
+# copy vs add is add for copy data from URL 
+RUN chmod 644  /code/while.py && adduser -D jack 
+# adding jack user
+USER jack 
+# calling jack user 
+ENTRYPOINT python3 /code/while.py 
+# REplacement of CMD and also having few difference 
+
+```
+
+### building it 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ ls
+java  python  webapp
+[ashu@ip-172-31-31-88 ashu-images]$ docker build -t  ashutask:v1 -f python/alpine.dockerfile  python/ 
+Sending build context to Docker daemon  4.608kB
+Step 1/7 : FROM alpine
+ ---> 9ed4aefc74f6
+Step 2/7 : LABEL name=ashutoshh
+ ---> Running in 5f96acd97747
+Removing intermediate container 5f96acd97747
+ ---> 477a52813996
+Step 3/7 : RUN apk add python3 && mkdir /code
+ ---> Running in efaf9058aa43
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/community/x86_64/APKINDEX.tar.gz
+(1/13) Installing libbz2 (1.0.8
+```
+
+### checking images 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker images
+REPOSITORY     TAG        IMAGE ID       CREATED              SIZE
+ashutask       v1         24881dc3deab   About a minute ago   58.8MB
+```
+
+### creating contaienr 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker run -itd --name ashucc2 ashutask:v1 
+2b833d281943afc6b8eb9620e1242af65d334e859ea793913742835fb325635f
+[ashu@ip-172-31-31-88 ashu-images]$ docker  ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS     NAMES
+2b833d281943   ashutask:v1            "/bin/sh -c 'python3…"   2 seconds ago    Up 1 second               ashucc2
+57011795cc78   saivisalalp:pycodev1   "python3 /pycodes/sc…"   9 minutes ago    Up 9 minutes              saivisal_a1_c1
+57b2ea720aa9   ishanalp:pycodev1      "python3 /pycodes/is…"   13 minutes ago   Up 13 minutes             ishanc1
+e3176d982c81   tejsh:v3               "python /mycode/tejs…"   20 minutes ago   Up 20 minutes             tejsh
+[ashu@ip-172-31-31-88 ashu-images]$ docker logs ashucc2
+Hello all , welcome to python..!!
+Welcome to LnB..
+Welcome to Containers ..!!
+______________________
+```
+
+### verify user
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker exec -it ashucc2 sh 
+/ $ id
+uid=1000(jack) gid=1000(jack) groups=1000(jack)
+/ $ ps -e
+PID   USER     TIME  COMMAND
+    1 jack      0:00 python3 /code/while.py
+    7 jack      0:00 sh
+   14 jack      0:00 ps -e
+/ $ exit
+```
+
 
