@@ -183,6 +183,11 @@ a4b08906be72   ashupy:v1   "python /mycode/ashu…"   3 seconds ago   Up 2 secon
 ### checking output 
 
 ```
+ashu@ip-172-31-31-88 ashu-images]$ docker logs  ashuc1 
+======>
+Hello all , welcome to python..!!
+Welcome to Oracle India ..
+Welcome to Containers By Docker..!!
 
 ```
 
