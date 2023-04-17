@@ -208,4 +208,30 @@ root@f147be1bd5f3:/mycode# exit
 exit
 ```
 
+### stop and remove containes  -- images
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ docker  kill ashuc1 ashuc2
+ashuc2
+Error response from daemon: Cannot kill container: ashuc1: Container a4b08906be729aee12521e61608b27fd48971b35397ae807e319aaa58b4524f2 is not running
+[ashu@ip-172-31-31-88 ashu-images]$ docker  rm ashuc1 ashuc2 
+ashuc1
+ashuc2
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ docker rmi ashupy:v1 
+Untagged: ashupy:v1
+Deleted: sha256:e5279d701ffde12a5bbdaae8dc5136cf2f2c7defca8ad03a8df09df2e0114a20
+Deleted: sha256:c9d953930d8a7884cb4704a000a625fa78ab25b32834a3cb38d4b9056ca02140
+Deleted: sha256:6abdc4ede8bcdf2888fbc720e4bb6fc2095d2a99ca8a4139b1204ddba34beec4
+[ashu@ip-172-31-31-88 ashu-images]$ docker rmi ashupy:v2 
+Untagged: ashupy:v2
+Deleted: sha256:b8334865f02538bd16a1ab701d34b99fd803fe215ed31d02af04716d1227b548
+Deleted: sha256:042bc45d495ee88b704bbe6085221ad1f8fcd44ecb30db34d5f4e0dec76fb1f0
+Deleted: sha256:055c6e021a81ec4445a56637986f8a7b934f11c4cc5cddd0bb03c435b51ee8ac
+Deleted: sha256:d7d9325a018e181679f9bb0613b7afc03c71ba278af39429d0d1733fdc5f3279
+Deleted: sha256:307a4c014ae5f2bbb9861f8dd5e191f880df1fa12de27be130807364a0cabd28
+Deleted: sha256:77f1c8563ffc57ee580123d38c61f2051985c9787992746299acbb75420f2f48
+[ashu@ip-172-31-31-88 ashu-images]$ 
+```
+
 
