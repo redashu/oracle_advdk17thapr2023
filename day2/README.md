@@ -36,3 +36,28 @@ docker run -it --name c1 --entrypoint  sleep 100   alpine
 
 <img src="ds.png">
 
+### Creating custom bridge with subnet 
+
+```
+root@ip-172-31-31-88 ~]# docker network create br3  --subnet  192.169.100.0/24 
+7db7cfdff8221a84bdff71c56e93e5632eb3e766cdaac0e650a9169ff1a34d9f
+```
+
+### giving static ip to container 
+
+```
+[root@ip-172-31-31-88 ~]# docker run -itd --name c9  --network br3  alpine 
+c622bef8e15e9ef36a80ab0f4b31bc6f3c1f9f3c617c5532c23d4ee9a9cde3f0
+[root@ip-172-31-31-88 ~]# docker exec -it c9 ifconfig 
+eth0      Link encap:Ethernet  HWaddr 02:42:C0:A9:64:02  
+          inet addr:192.169.100.2  Bcast:192.169.100.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:12 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:1112 (1.0 KiB)  TX bytes:0 (0.0 B)
+
+
+```
+
+
