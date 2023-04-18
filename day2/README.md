@@ -1,3 +1,8 @@
+### target of the day 
+
+<img src="tg.png">
+
+
 ### Revision 
 
 ### docker server store images in given format 
@@ -59,5 +64,18 @@ eth0      Link encap:Ethernet  HWaddr 02:42:C0:A9:64:02
 
 
 ```
+
+## Introduction to Rancher Desktop 
+
+<img src="rancher.png">
+
+### rancher desktop prerequisite 
+
+<img src="pre.png">
+
+### Rancher Desktop reality 
+
+<img src="ran.png">
+
 
 
