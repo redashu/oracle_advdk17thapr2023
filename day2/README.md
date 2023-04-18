@@ -664,6 +664,12 @@ Removing login credentials for https://index.docker.io/v1/
 [ashu@ip-172-31-31-88 ashu-customer]$ 
 ```
 
+### image pulling 
+
+<img src="pull.png">
+
+
+
 
 
 
