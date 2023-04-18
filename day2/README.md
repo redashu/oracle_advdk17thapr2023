@@ -465,7 +465,131 @@ java-1.8.0-openjdk-demo.x86_64 : OpenJDK 8 Demos
 java-1.8.0-openjdk-devel.x86_64 : OpenJDK 8 Development Environment
 ```
 
+### Dockerfile advanced concept 
 
+<img src="adv.png">
+
+### custom story of webapp
+
+<img src="cus.png">
+
+### cloning sample apps
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ cd ashu-customer/
+[ashu@ip-172-31-31-88 ashu-customer]$ ls
+[ashu@ip-172-31-31-88 ashu-customer]$ git clone https://github.com/schoolofdevops/html-sample-app.git
+Cloning into 'html-sample-app'...
+
+ git clone https://github.com/microsoft/project-html-website.git
+ 
+ ===
+ [ashu@ip-172-31-31-88 ashu-customer]$ ls
+html-sample-app  project-html-website
+```
+
+### using webserver to hosting app in containers
+
+<img src="appc.png">
+
+### Dockerfile -- using ENV 
+
+```
+FROM oraclelinux:8.4 
+LABEL name=ashutoshh
+ENV deploy=app 
+# to create env variable and its default value 
+RUN yum install httpd -y 
+RUN mkdir /webapp  /webapp/app1 /webapp/app2 
+COPY html-sample-app /webapp/app1/
+COPY project-html-website /webapp/app2/
+COPY deploy_app.sh  /webapp/
+WORKDIR /webapp
+RUN chmod +x deploy_app.sh 
+ENTRYPOINT ["./deploy_app.sh"]
+```
+
+### adding compose file 
+
+```
+version: '3.8'
+services:
+  ashu-customer-case:
+    image: ashu-customer:app
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: ashu-c1
+    environment: # passing env variable and value 
+      deploy: "world"
+    ports: # for forwarding 
+    - 1234:80 
+```
+
+### running compose 
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ ls
+Dockerfile  deploy_app.sh  docker-compose.yaml  html-sample-app  project-html-website
+[ashu@ip-172-31-31-88 ashu-customer]$ docker-compose  up -d --build 
+[+] Building 65.6s (13/13) FINISHED                                                                                             
+ => [internal] load build definition from Dockerfile                                                                       0.0s
+ => => transferring dockerfile: 455B                                                                                       0.0s
+ => [internal] load .dockerignore                                                                                          0.0s
+ => => transferring context: 224B                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/oraclelinux:8.4                                                         0.0s
+ => [internal] load build context                                                                                          0.1s
+ => => transferring context: 2.88MB                                                                                        0.1s
+ => CACHED [1/8] FROM docker.io/library/oraclelinux:8.4                                                                    0.0s
+ => [2/8] RUN yum install httpd -y                                                                                        57.2s
+ => [3/8] RUN mkdir /webapp  /webapp/app1 /webapp/app2                                                                     1.3s
+ => [4/8] COPY html-sample-app /webapp/app1/                                                                               0.2s 
+ => [5/8] COPY project-html-website /webapp/app2/                                                                          0.3s 
+ => [6/8] COPY deploy_app.sh  /webapp/                                                                                     0.2s 
+ => [7/8] WORKDIR /webapp                                                                                                  0.2s 
+ => [8/8] RUN chmod +x deploy_app.sh                                                                                       1.6s 
+ => exporting to image                                                                                                     4.3s
+ => => exporting layers                                                                                                    4.2s
+ => => writing image sha256:badcc953322f7a2b92efba0cc9858df7a758acc87d71e8c554b963b308b6f5ac                               0.0s
+ => => naming to docker.io/library/ashu-customer:app                                                                       0.0s
+[+] Running 2/2
+ ✔ Network ashu-customer_default  Created                                                                                  0.4s 
+ ✔ Container ashu-c1              Started               
+```
+
+### checking
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker-compose  ps
+NAME                IMAGE               COMMAND             SERVICE              CREATED             STATUS              PORTS
+ashu-c1             ashu-customer:app   "./deploy_app.sh"   ashu-customer-case   34 seconds ago      Up 32 seconds       0.0.0.0:1234->80/tcp, :::1234->80/tcp
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+```
+
+### containers with compose 
+
+```
+version: '3.8'
+services:
+  ashu-customer-case:
+    image: ashu-customer:app
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: ashu-c1
+    environment: # passing env variable and value 
+      deploy: "world"
+    ports: # for forwarding 
+    - 1234:80 
+  ashu-customer-case2:
+    image: ashu-customer:app
+    container_name: ashu-c2
+    environment:
+      deploy: "hello"
+    ports:
+      - 1255:80 
+      
+```
 
 
 
