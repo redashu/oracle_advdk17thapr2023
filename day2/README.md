@@ -213,5 +213,43 @@ OCI runtime exec failed: exec failed: unable to start container process: exec: "
   19152 ?        00:00:00 python3
 ```
 
+### namespace drama
+
+<img src="ns.png">
+
+
+## Understanding CIS std for container image / code security bugs finding purpose 
+
+<img src="sec1.png">
+
+### installing and using trivy 
+
+```
+[root@ip-172-31-31-88 ~]# rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.40.0/trivy_0.40.0_Linux-64bit.rpm
+Retrieving https://github.com/aquasecurity/trivy/releases/download/v0.40.0/trivy_0.40.0_Linux-64bit.rpm
+warning: /var/tmp/rpm-tmp.o9udur: Header V4 RSA/SHA256 Signature, key ID 6276fa6c: NOKEY
+Verifying...                          ################################# [100%]
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:trivy-0:0.40.0-1                 ################################# [100%]
+[root@ip-172-31-31-88 ~]# 
+[root@ip-172-31-31-88 ~]# 
+[root@ip-172-31-31-88 ~]# trivy version 
+Version: 0.40.0
+[root@ip-172-31-31-88 ~]#
+```
+
+### lets do this
+
+```
+ 254  trivy image alpine
+  255  trivy image ashupy:v2 
+  256  trivy image  nginx:1.12 
+```
+
+
+
+
+
 
 
