@@ -445,6 +445,26 @@ Total: 30 (HIGH: 30, CRITICAL: 0)
 ```
 
 
+### TIp for search jdk in oraclelinux:8.4 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ docker run -it --rm oraclelinux:8.4 
+[root@7e58f9c97fb5 /]# 
+[root@7e58f9c97fb5 /]# 
+[root@7e58f9c97fb5 /]# dnf search jdk 
+Oracle Linux 8 BaseOS Latest (x86_64)                                                            72 MB/s |  57 MB     00:00    
+Oracle Linux 8 Application Stream (x86_64)                                                       64 MB/s |  43 MB     00:00    
+Last metadata expiration check: 0:00:11 ago on Tue Apr 18 07:38:11 2023.
+================================================= Name & Summary Matched: jdk ==================================================
+copy-jdk-configs.noarch : JDKs configuration files copier
+copy-jdk-configs.src : JDKs configuration files copier
+java-1.8.0-openjdk.src : OpenJDK 8 Runtime Environment
+java-1.8.0-openjdk.x86_64 : OpenJDK 8 Runtime Environment
+java-1.8.0-openjdk-accessibility.x86_64 : OpenJDK 8 accessibility connector
+java-1.8.0-openjdk-demo.x86_64 : OpenJDK 8 Demos
+java-1.8.0-openjdk-devel.x86_64 : OpenJDK 8 Development Environment
+```
+
 
 
 
