@@ -247,6 +247,205 @@ Version: 0.40.0
   256  trivy image  nginx:1.12 
 ```
 
+## task 
+
+### Directory 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ pwd
+/home/ashu/ashu-images/ashu-task
+```
+
+### java code -- ashu.java
+
+```
+class myclass { 
+    public static void main(String args[]) 
+    { 
+        // test expression 
+        while (true) { 
+            System.out.println("Hello World By Ashutoshh !! "); 
+            try {
+                Thread.sleep(2000);
+            } catch (Exception ex) {
+                // Ignored
+            }
+  
+            // update expression 
+        } 
+    } 
+} 
+```
+
+### dockerfile -- java8.dockerfile
+
+```
+FROM oraclelinux:8.4 
+LABEL name=ashutoshh
+LABEL   email=ashutoshh@linux.com
+RUN dnf install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y 
+RUN mkdir /code 
+COPY ashu.java /code/
+WORKDIR /code
+# changing directory like cd command 
+RUN javac ashu.java 
+# compiling 
+CMD ["java","myclass"]
+```
+
+### docker-compose file 
+
+```
+version: '3.8'
+# 3.x is already creating a new docker bridge
+networks: # creating bridge with custom name
+  ashubr11: 
+services: 
+  ashu-java-test:
+    image: ashujava:v1 
+    build:
+      context: . 
+      dockerfile: java8.dockerfile
+    container_name: ashujc1 
+    networks: # attaching container to the custom bridge 
+    - ashubr11 
+```
+
+### lets run it 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ ls
+ashu.java  docker-compose.yaml  java8.dockerfile
+[ashu@ip-172-31-31-88 ashu-task]$ docker-compose  up -d --build 
+[+] Building 62.0s (11/11) FINISHED                                                                                             
+ => [internal] load build definition from java8.dockerfile                                                                 0.0s
+ => => transferring dockerfile: 406B                                                                                       0.0s
+ => [internal] load .dockerignore                                                                                          0.0s
+ => => transferring context: 2B                                                                                            0.0s
+ => [internal] load metadata for docker.io/library/oraclelinux:8.4                                                         0.0s
+ => [internal] load build context                                                                                          0.0s
+ => => transferring context: 471B                                                                                          0.0s
+ => CACHED [1/6] FROM docker.io/library/oraclelinux:8.4                                                                    0.0s
+ => [2/6] RUN dnf install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y                                    55.9s
+ => [3/6] RUN mkdir /code                                                                                                  0.5s
+ => [4/6] COPY ashu.java /code/                                                                                            0.1s 
+ => [5/6] WORKDIR /code                                                                                                    0.1s 
+ => [6/6] RUN javac ashu.java                                                                                              1.4s 
+ => exporting to image                                                                                                     3.8s 
+ => => exporting layers                                                                                                    3.8s 
+ => => writing image sha256:c0a687f65489c32a93be2c517f266decd53b3b54e75f3776b097f11c59163e24                               0.0s
+ => => naming to docker.io/library/ashujava:v1                                                                             0.0s
+[+] Running 2/2
+ ✔ Network ashu-task_ashubr11  Created                                                                                     0.1s 
+ ✔ Container ashujc1           Started                         
+```
+
+### checking 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ docker-compose  ps
+NAME                IMAGE               COMMAND             SERVICE             CREATED             STATUS              PORTS
+ashujc1             ashujava:v1         "java myclass"      ashu-java-test      7 seconds ago       Up 6 seconds   
+```
+
+### output 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ docker-compose  logs ashu-java-test
+ashujc1  | Hello World By Ashutoshh !! 
+ashujc1  | Hello World By Ashutoshh !! 
+ashujc1  | Hello World By Ashutoshh !! 
+ashujc1  | Hello World By Ashutoshh !! 
+```
+
+### scaning of image 
+
+```
+[ashu@ip-172-31-31-88 ashu-task]$ trivy   image  ashujava:v1 
+2023-04-18T07:30:30.653Z        INFO    Vulnerability scanning is enabled
+2023-04-18T07:30:30.653Z        INFO    Secret scanning is enabled
+2023-04-18T07:30:30.653Z        INFO    If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2023-04-18T07:30:30.653Z        INFO    Pleas
+```
+
+### more options 
+
+```
+ashu@ip-172-31-31-88 ashu-task]$ trivy   image  --severity HIGH,CRITICAL  ashujava:v1   
+2023-04-18T07:32:15.067Z        INFO    Vulnerability scanning is enabled
+2023-04-18T07:32:15.067Z        INFO    Secret scanning is enabled
+2023-04-18T07:32:15.067Z        INFO    If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2023-04-18T07:32:15.067Z        INFO    Please see also https://aquasecurity.github.io/trivy/v0.40/docs/secret/scanning/#recommendation for faster secret detection
+2023-04-18T07:32:15.082Z        INFO    Detected OS: oracle
+2023-04-18T07:32:15.082Z        INFO    Detecting Oracle Linux vulnerabilities...
+2023-04-18T07:32:15.095Z        INFO    Number of language-specific files: 0
+
+ashujava:v1 (oracle 8.4)
+
+Total: 30 (HIGH: 30, CRITICAL: 0)
+
+┌──────────────────┬────────────────┬──────────┬────────────────────────┬───────────────────────┬──────────────────────────────────────────────────────────────┐
+│     Library      │ Vulnerability  │ Severity │   Installed Version    │     Fixed Version     │                            Title                             │
+├──────────────────┼────────────────┼──────────┼────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ bind-export-libs │ CVE-2022-38177 │ HIGH     │ 32:9.11.26-4.el8_4     │ 32:9.11.36-3.el8_6.1  │ bind: memory leak in ECDSA DNSSEC verification code          │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-38177                   │
+│                  ├────────────────┤          │                        │                       ├──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-38178 │          │                        │                       │ bind: memory leaks in EdDSA DNSSEC verification code         │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-38178                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ cyrus-sasl-lib   │ CVE-2022-24407 │          │ 2.1.27-5.el8           │ 2.1.27-6.el8_5        │ cyrus-sasl: failure to properly escape SQL input allows an   │
+│                  │                │          │                        │                       │ attacker to execute...                                       │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-24407                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ expat            │ CVE-2021-45960 │          │ 2.2.5-4.el8            │ 2.2.5-4.el8_5.3       │ expat: Large number of prefixed XML attributes on a single   │
+│                  │                │          │                        │                       │ tag can...                                                   │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2021-45960                   │
+│                  ├────────────────┤          │                        │                       ├──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2021-46143 │          │                        │                       │ expat: Integer overflow in doProlog in xmlparse.c            │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2021-46143                   │
+│                  ├────────────────┤          │                        │                       ├──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-23852 │          │                        │                       │ expat: Integer overflow in function XML_GetBuffer            │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-23852                   │
+│                  ├────────────────┤          │                        ├───────────────────────┼──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-23990 │          │                        │ 2.2.5-4.0.1.el8_5.3   │ expat: integer overflow in the doProlog function             │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-23990                   │
+│                  ├────────────────┤          │                        ├───────────────────────┼──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-25235 │          │                        │ 2.2.5-4.el8_5.3       │ expat: Malformed 2- and 3-byte UTF-8 sequences can lead to   │
+│                  │                │          │                        │                       │ arbitrary code...                                            │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-25235                   │
+│                  ├────────────────┤          │                        │                       ├──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-25236 │          │                        │                       │ expat: Namespace-separator characters in "xmlns[:prefix]"    │
+│                  │                │          │                        │                       │ attribute values can lead to arbitrary code...               │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-25236                   │
+│                  ├────────────────┤          │                        │                       ├──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-25315 │          │                        │                       │ expat: Integer overflow in storeRawNames()                   │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-25315                   │
+│                  ├────────────────┤          │                        ├───────────────────────┼──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-40674 │          │                        │ 2.2.5-8.0.1.el8_6.3   │ expat: a use-after-free in the doContent function in         │
+│                  │                │          │                        │                       │ xmlparse.c                                                   │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-40674                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ gzip             │ CVE-2022-1271  │          │ 1.9-12.el8             │ 1.9-13.el8_5          │ gzip: arbitrary-file-write vulnerability                     │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-1271                    │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ krb5-libs        │ CVE-2022-42898 │          │ 1.18.2-8.3.el8_4       │ 1.18.2-22.0.1.el8_7   │ krb5: integer overflow vulnerabilities in PAC parsing        │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-42898                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ libgcrypt        │ CVE-2021-40528 │          │ 1.8.5-4.el8            │ 10:1.8.5-7.el8_6_fips │ libgcrypt: ElGamal implementation allows plaintext recovery  │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2021-40528                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ libksba          │ CVE-2022-3515  │          │ 1.3.5-7.el8            │ 1.3.5-8.el8_6         │ libksba: integer overflow may lead to remote code execution  │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-3515                    │
+│                  ├────────────────┤          │                        ├───────────────────────┼──────────────────────────────────────────────────────────────┤
+│                  │ CVE-2022-47629 │          │                        │ 1.3.5-9.el8_7         │ libksba: integer overflow to code execution                  │
+│                  │                │          │                        │                       │ https://avd.aquasec.com/nvd/cve-2022-47629                   │
+├──────────────────┼────────────────┤          ├────────────────────────┼───────────────────────┼──────────────────────────────────────────────────────────────┤
+│ openssl-libs     │ CVE-2022-4304  │          │ 1:1.1.1g-15.el8_3      │ 1:1.1.1k-9.el8_7      │ timing attack in RSA Decryption implementation               │
+│                  │                │          │                        │         
+```
+
+
+
 
 
 
