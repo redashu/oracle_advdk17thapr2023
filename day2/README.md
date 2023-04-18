@@ -591,6 +591,79 @@ services:
       
 ```
 
+## Docker image registry options 
+
+<img src="reg.png">
+
+### image name concept in Docker hub 
+
+<img src="name.png">
+
+### demo 
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker  pull oraclelinux:8.3 
+8.3: Pulling from library/oraclelinux
+dd34f38d274c: Pull complete 
+Digest: sha256:af3182ee6c1e56f18fc1fecaf638da57d7c47233862e5c32f5ad723a6ab4c6db
+Status: Downloaded newer image for oraclelinux:8.3
+docker.io/library/oraclelinux:8.3
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+
+
+```
+
+### pushing image to docker hub 
+
+### tagging image as per docker hub std
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker  images  |  head -3
+REPOSITORY            TAG       IMAGE ID       CREATED             SIZE
+ashucming             v007      d4d0377464d5   23 minutes ago      526MB
+hemacimg              v007      eaf09f7b14f4   36 minutes ago      650MB
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+
+[ashu@ip-172-31-31-88 ashu-customer]$ docker  tag       ashucming:v007     docker.io/dockerashu/ashucimg:v007 
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+[ashu@ip-172-31-31-88 ashu-customer]$ docker  images  |  head -3
+REPOSITORY            TAG       IMAGE ID       CREATED             SIZE
+dockerashu/ashucimg   v007      d4d0377464d5   25 minutes ago      526MB
+ashucming             v007      d4d0377464d5   25 minutes ago      526MB
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+```
+
+### login docker hub from docker client 
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker  login 
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: dockerashu
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+```
+
+### nOw push it 
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker push docker.io/dockerashu/ashucimg:v007 
+The push refers to repository [docker.io/dockerashu/ashucimg]
+069e051d6c8a: Pushing [==========================>                        ]  147.3MB/280MB
+2d3586eacb61: Layer already exists 
+```
+
+### logout for security purpose 
+
+```
+[ashu@ip-172-31-31-88 ashu-customer]$ docker logout 
+Removing login credentials for https://index.docker.io/v1/
+[ashu@ip-172-31-31-88 ashu-customer]$ 
+```
+
 
 
 
