@@ -406,6 +406,27 @@ IPs:
   IP:  192.168.58.217
 ```
 
+### accessing container inside pod 
+
+```
+ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  exec -it ashu-pod123    -- bash 
+[root@ashu-pod123 webapp]# 
+[root@ashu-pod123 webapp]# ls
+app1  app2  deploy_app.sh
+[root@ashu-pod123 webapp]# exit
+exit
+```
+
+### Deleting pod 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl delete pod ashu-pod123
+pod "ashu-pod123" deleted
+
+
+```
+
+
 
 
 
