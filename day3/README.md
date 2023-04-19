@@ -425,6 +425,42 @@ pod "ashu-pod123" deleted
 
 
 ```
+### Deleting all the pods 
+
+```
+ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  delete pods --all 
+pod "busybox-pod-123" deleted
+pod "busybox-pod123" deleted
+pod "hema-pod-asgn1" deleted
+pod "hema-pod123" deleted
+```
+
+### creating pod using kubectl cli 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl run ashu-autopod  --image=docker.io/dockerashu/ashu-customer:v1  --port 80 
+pod/ashu-autopod created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get  po 
+NAME           READY   STATUS    RESTARTS   AGE
+ashu-autopod   1/1     Running   0          5s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+
+### automatically generate YAML / JSON file for pod
+
+```
+  425  kubectl  get  pods
+  426  kubectl run ashu-autopod  --image=docker.io/dockerashu/ashu-customer:v1  --port 80  --dry-run=client  -o yaml 
+  427  kubectl run ashu-autopod  --image=docker.io/dockerashu/ashu-customer:v1  --port 80  --dry-run=client  -o json 
+  428  history 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl run ashu-autopod  --image=docker.io/dockerashu/ashu-customer:v1  --port 80  --dry-run=client  -o yaml  >autopod.yaml
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl run ashu-autopod  --image=docker.io/dockerashu/ashu-customer:v1  --port 80  --dry-run=client  -o json  >autopod1.json
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ ls
+ashupod1.yaml  autopod.yaml  autopod1.json
+```
+
 
 
 
