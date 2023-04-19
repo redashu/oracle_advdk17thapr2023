@@ -334,6 +334,78 @@ config
 ```
 
 
+### Lets send first request to control plane -- apiserver 
+
+```
+[ashu@ip-172-31-31-88 ~]$ ls  /home/ashu/.kube/
+cache  config
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  nodes
+NAME                             STATUS   ROLES    AGE   VERSION
+ip-192-168-60-196.ec2.internal   Ready    <none>   27m   v1.25.7-eks-a59e1f0
+ip-192-168-7-251.ec2.internal    Ready    <none>   27m   v1.25.7-eks-a59e1f0
+[ashu@ip-172-31-31-88 ~]$ 
+
+
+```
+
+### etcd in control plane
+
+<img src="etcd.png">
+
+### First POd info 
+
+```
+apiVersion: v1 # i am sending data to  v1 version of k8s control plane 
+kind: Pod 
+metadata:
+  name: ashu-pod123 # name of pod i want to request 
+spec:
+  containers: 
+  - name: ashuc1 # name of container 
+    image: docker.io/dockerashu/ashu-customer:v1 # image from docker hub 
+    ports:
+    - containerPort: 80 #internal container port 
+```
+
+### deploy it 
+
+```
+ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f ashupod1.yaml 
+pod/ashu-pod123 unchanged
+```
+
+### checking more details about pod 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get  po ashu-pod123 -o wide 
+NAME          READY   STATUS    RESTARTS   AGE   IP               NODE                             NOMINATED NODE   READINESS GATES
+ashu-pod123   1/1     Running   0          26m   192.168.58.217   ip-192-168-60-196.ec2.internal   <none>           <none>
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get no
+NAME                             STATUS   ROLES    AGE   VERSION
+ip-192-168-60-196.ec2.internal   Ready    <none>   88m   v1.25.7-eks-a59e1f0
+ip-192-168-7-251.ec2.internal    Ready    <none>   88m   v1.25.7-eks-a59e1f0
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+```
+
+### Describe pod 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  describe pod ashu-pod123 
+Name:             ashu-pod123
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             ip-192-168-60-196.ec2.internal/192.168.60.196
+Start Time:       Wed, 19 Apr 2023 09:31:50 +0000
+Labels:           <none>
+Annotations:      <none>
+Status:           Running
+IP:               192.168.58.217
+IPs:
+  IP:  192.168.58.217
+```
+
 
 
 
