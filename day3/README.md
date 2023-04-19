@@ -267,3 +267,31 @@ minion1   Ready    <none>          21s     v1.25.9
 minion2   Ready    <none>          6m26s   v1.25.9
 ```
 
+### setup k8s client machines
+
+<img src="client.png">
+
+### use link to install kubectl on k8s client machine 
+
+[click_here](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+
+### checking it 
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ kubectl  version --client  -o json 
+{
+  "clientVersion": {
+    "major": "1",
+    "minor": "25",
+    "gitVersion": "v1.25.9",
+    "gitCommit": "a1a87a0a2bcd605820920c6b0e618a8ab7d117d4",
+    "gitTreeState": "clean",
+    "buildDate": "2023-04-12T12:16:51Z",
+    "goVersion": "go1.19.8",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  },
+  "kustomizeVersion": "v4.5.7"
+}
+```
+
