@@ -233,5 +233,37 @@ kubeadm join 172.31.22.163:6443 --token ynhxtk.rcltnzn5okvu4660 \
  kubeadm join 172.31.22.163:6443 --token ynhxtk.rcltnzn5okvu4660   --discovery-token-ca-cert-hash sha256:9ef6241581f2ad21a498f98714bdf833ddd028f8f26172
 ```
 
+## For k8s Networking of container will be done by CNI 
 
+<img src="cni.png">
+
+### to make all the nodes in ready state i have to implement CNI -- using Calico
+
+```
+root@ip-172-31-22-163 ~]# wget https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+[root@ip-172-31-22-163 ~]# ls
+calico.yaml  setup.sh
+[root@ip-172-31-22-163 ~]# kubectl apply -f calico.yaml 
+poddisruptionbudget.policy/calico-kube-controllers created
+serviceaccount/calico-kube-controllers created
+serviceaccount/calico-node created
+configmap/calico-config created
+customresourcedefinition.apiextensions.k8s.io/bgpconfigurations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/bgppeers.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/blockaffinities.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/caliconodestatuses.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/clusterinformations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/felixconfigurations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8
+```
+
+### lets check nodes again 
+
+```
+root@master ~]# kubectl get nodes -w
+NAME      STATUS   ROLES           AGE     VERSION
+master    Ready    control-plane   7m52s   v1.25.9
+minion1   Ready    <none>          21s     v1.25.9
+minion2   Ready    <none>          6m26s   v1.25.9
+```
 
