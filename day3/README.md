@@ -295,3 +295,45 @@ ashu@ip-172-31-31-88 ashu-images]$ kubectl  version --client  -o json
 }
 ```
 
+### From k8s client -- control plane -- {we can send request to apiserver }
+
+<img src="apis.png">
+
+### setting up credential fo kubectl client 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl  get  nodes
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ mkdir  ~/.kube 
+[ashu@ip-172-31-31-88 ashu-images]$ cd  ~/.kube/
+[ashu@ip-172-31-31-88 .kube]$ ls
+[ashu@ip-172-31-31-88 .kube]$
+```
+### creating config file 
+
+```
+[ashu@ip-172-31-31-88 .kube]$ wget  172.31.22.163/admin.conf 
+--2023-04-19 07:02:12--  http://172.31.22.163/admin.conf
+Connecting to 172.31.22.163:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 5637 (5.5K) [text/plain]
+Saving to: ‘admin.conf’
+
+admin.conf                      100%[=======================================================>]   5.50K  --.-KB/s    in 0s      
+
+2023-04-19 07:02:12 (552 MB/s) - ‘admin.conf’ saved [5637/5637]
+
+[ashu@ip-172-31-31-88 .kube]$ ls
+admin.conf
+[ashu@ip-172-31-31-88 .kube]$ mv admin.conf  config 
+[ashu@ip-172-31-31-88 .kube]$ 
+[ashu@ip-172-31-31-88 .kube]$ ls
+config
+```
+
+
+
+
+
