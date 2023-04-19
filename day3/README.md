@@ -139,3 +139,99 @@ REPOSITORY  TAG         IMAGE ID    CREATED     SIZE
 
 ```
 
+### problem with container scale in prod 
+
+<img src="prod.png">
+
+## Introduction to container orchestration 
+
+<img src="carch.png">
+
+## Introduction k8s 
+
+<img src="arch1.png">
+
+### ways to setup k8s cluster 
+
+<img src="setup.png">
+
+### Now are having 3 vm 
+
+## step to setup ks8 cluster 
+
+### Step to perform in every vm 
+
+```
+modprobe br_netfilter
+echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+swapoff  -a
+
+cat  <<EOF  >/etc/yum.repos.d/kube.repo
+[kube]
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+gpgcheck=0
+EOF
+
+yum install docker  kubeadm-1.25* kubelet-1.25*  kubectl-1.25* -y 
+
+cat  <<X  >/etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"]
+}
+
+X
+
+systemctl enable --now  docker kubelet
+
+
+```
+
+### Step to perform in only one vm you want to create as Master / Control plane 
+
+```
+[root@master ~]# kubeadm  init --pod-network-cidr=192.168.0.0/16
+I0419 05:27:25.261348   26935 version.go:256] remote version is much newer: v1.27.1; falling back to: stable-1.25
+[init] Using Kubernetes version: v1.25.9
+[preflight] Running pre-flight checks
+	[WARNING FileExisting-tc]: tc not found in system path
+	[WARNING Hostname]: hostname "master" could not be reached
+	[WARNING Hostname]: hostname "master": lookup master on 172.31.0.2:53: no such host
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+
+```
+
+### More step in Master after above step completion 
+
+```
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 172.31.22.163:6443 --token ynhxtk.rcltnzn5okvu4660 \
+	--discovery-token-ca-cert-hash sha256:9ef6241581f2ad21a498f98714bdf833ddd028f8f26172cd21bcfd40b6b32ec0 
+```
+
+### kubeadm join you can try in workers / minion 
+
+```
+ kubeadm join 172.31.22.163:6443 --token ynhxtk.rcltnzn5okvu4660   --discovery-token-ca-cert-hash sha256:9ef6241581f2ad21a498f98714bdf833ddd028f8f26172
+```
+
+
+
