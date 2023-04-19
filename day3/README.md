@@ -461,7 +461,42 @@ ashu-autopod   1/1     Running   0          5s
 ashupod1.yaml  autopod.yaml  autopod1.json
 ```
 
+### demo
 
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f autopod1.json 
+pod/ashu-autopod created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  po 
+NAME              READY   STATUS    RESTARTS   AGE
+ashu-autopod      1/1     Running   0          7s
+ravinder-pod123   1/1     Running   0          2m44s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl delete -f autopod1.json 
+pod "ashu-autopod" deleted
+
+
+```
+
+### defining process in pod container 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashutask
+  name: ashutask
+spec:
+  containers:
+  - image: busybox
+    name: ashutask
+    command: ["ping","fb.com"]
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
 
 
 
