@@ -497,6 +497,112 @@ spec:
 status: {}
 
 ```
+### creating namespace in k8s 
+
+### listing namespace
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl  get  namespaces 
+NAME              STATUS   AGE
+default           Active   156m
+kube-node-lease   Active   156m
+kube-public       Active   156m
+kube-system       Active   156m
+[ashu@ip-172-31-31-88 ashu-images]$ 
+
+```
+
+### creating and setting namespace for user
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl   get  pods
+No resources found in default namespace.
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl create ns  ashu-deploy
+namespace/ashu-deploy created
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl  get  namespaces 
+NAME              STATUS   AGE
+ashu-deploy       Active   5s
+default           Active   158m
+kube-node-lease   Active   158m
+kube-public       Active   158m
+kube-system       Active   158m
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl config set-context --current --namespace=ashu-deploy
+Context "arn:aws:eks:us-east-1:751136288263:cluster/basic-cluster1" modified.
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ 
+```
+
+### checking default namespace 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl config get-contexts 
+CURRENT   NAME                                                        CLUSTER                                                     AUTHINFO                                                    NAMESPACE
+*         arn:aws:eks:us-east-1:751136288263:cluster/basic-cluster1   arn:aws:eks:us-east-1:751136288263:cluster/basic-cluster1   arn:aws:eks:us-east-1:751136288263:cluster/basic-cluster1   ashu-deploy
+```
+
+### creating pod yaml in custom namespace 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl run ashu-webapp --image=dockerashu/ashu-customer:v1 --port 80 --dry-run=client -o yaml  >app1.yaml 
+[ashu@ip-172-31-31-88 a
+```
+
+### checking 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get pods
+No resources found in ashu-deploy namespace.
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f app1.yaml 
+pod/ashu-webapp created
+[ashu@ip-172-31-31-88 k8s-app-deploy
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get pods
+NAME          READY   STATUS    RESTARTS   AGE
+ashu-webapp   1/1     Running   0          15s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### passing value in env section 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashu-webapp
+  name: ashu-webapp
+  namespace: ashu-deploy
+spec:
+  containers:
+  - image: dockerashu/ashu-customer:v1
+    name: ashu-webapp
+    env: # creating or using env 
+    - name: deploy # name of variable 
+      value: hello # passing value 
+    ports:
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
+
+### replace pod yaml 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl replace -f app1.yaml  --force
+pod "ashu-webapp" deleted
+pod/ashu-webapp replaced
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  pods
+NAME          READY   STATUS    RESTARTS   AGE
+ashu-webapp   1/1     Running   0          6s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+```
+
 
 
 
