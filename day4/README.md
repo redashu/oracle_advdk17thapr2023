@@ -640,5 +640,169 @@ clusterrolebinding.rbac.authorization.k8s.io/xyz created
 
 <img src="hpa.png">
 
+### k8s need monitoring of resource capability to scale pods 
+
+<img src="mon.png">
+
+### checking monitoring capability of node / pod 
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ kubectl  top
+Display Resource (CPU/Memory) usage.
+
+ The top command allows you to see the resource consumption for nodes or pods.
+
+ This command requires Metrics Server to be correctly configured and working on the server.
+
+Available Commands:
+  node          Display resource (CPU/memory) usage of nodes
+  pod           Display resource (CPU/memory) usage of pods
+
+Usage:
+  kubectl top [flags] [options]
+
+Use "kubectl <command> --help" for more information about a given command.
+Use "kubectl options" for a list of global command-line options (applies to all commands).
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl   get  node
+NAME      STATUS   ROLES           AGE   VERSION
+master    Ready    control-plane   20h   v1.27.1
+minion1   Ready    <none>          20h   v1.27.1
+minion2   Ready    <none>          20h   v1.27.1
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl  top  node minion1 
+error: Metrics API not available
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get po 
+NAME       READY   STATUS    RESTARTS   AGE
+ashu-app   1/1     Running   0          116m
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl top pod ashu-app 
+error: Metrics API not available
+```
+
+### Deploy metric server in k8s 
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ kubectl apply -f https://raw.githubusercontent.com/redashu/k8s/hpa/hpa/components.yaml
+serviceaccount/metrics-server created
+clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+service/metrics-server created
+deployment.apps/metrics-server created
+apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl  get  po -n kube-system 
+NAME                                       READY   STATUS    RESTARTS        AGE
+calico-kube-controllers-6c99c8747f-8plm9   1/1     Running   1 (7h13m ago)   20h
+calico-node-c49mv                          1/1     Running   1 (7h13m ago)   20h
+calico-node-jbkdc                          1/1     Running   1 (7h12m ago)   20h
+calico-node-sm79b                          1/1     Running   1 (7h13m ago)   20h
+coredns-5d78c9869d-8xn62                   1/1     Running   1 (7h13m ago)   20h
+coredns-5d78c9869d-gh6j2                   1/1     Running   1 (7h13m ago)   20h
+etcd-master                                1/1     Running   1 (7h13m ago)   20h
+kube-apiserver-master                      1/1     Running   0               2m41s
+kube-controller-manager-master             1/1     Running   2 (3m10s ago)   20h
+kube-proxy-76xgz                           1/1     Running   1 (7h12m ago)   20h
+kube-proxy-t766g                           1/1     Running   1 (7h13m ago)   20h
+kube-proxy-xx4vb                           1/1     Running   1 (7h13m ago)   20h
+kube-scheduler-master                      1/1     Running   2 (3m10s ago)   20h
+metrics-server-6df6656494-wv2qp            1/1     Running   0               11s
+```
+
+### testing 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$  kubectl  top  node minion1 
+NAME      CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   
+minion1   82m          4%     1027Mi          13%       
+[ashu@ip-172-31-31-88 ashu-images]$  kubectl  top  node minion2
+NAME      CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   
+minion2   75m          3%     1132Mi          14%       
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl top pod  ashu-app 
+NAME       CPU(cores)   MEMORY(bytes)   
+ashu-app   1m           82Mi            
+[ashu@ip-172-31-31-88 ashu-images]$ 
+
+```
+
+### showing hpa case 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl create deployment ashu-ui --image=adminer --port 8080 --dry-run=client -o yaml >hpa1.yaml
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### final YAML 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-ui
+  name: ashu-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-ui
+  strategy: {}
+  template: # for creating pods 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-ui
+    spec:
+      containers:
+      - image: adminer
+        name: adminer
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 100M
+            cpu: 50m 
+          limits:
+            memory: 400M 
+            cpu: 200m # 1 vcpu = 1000m (milicore)
+status: {}
+
+```
+
+### deploy hpa 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  deploy 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-ui   1/1     1            1           5m32s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl autoscale  deployment ashu-ui --cpu-percent 70 --max 20 --min 2 --dry-run=client -o yaml >autoscale.yaml 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f autoscale.yaml 
+horizontalpodautoscaler.autoscaling/ashu-ui created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get hpa
+NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+ashu-ui   Deployment/ashu-ui   <unknown>/70%   2         20        0          4s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### checking 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f autoscale.yaml 
+horizontalpodautoscaler.autoscaling/ashu-ui created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get hpa
+NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+ashu-ui   Deployment/ashu-ui   <unknown>/70%   2         20        0          4s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get hpa
+NAME      REFERENCE            TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+ashu-ui   Deployment/ashu-ui   2%/70%    2         20        2          44s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  deploy 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-ui   2/2     2            2           8m49s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+```
+
 
 
