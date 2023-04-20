@@ -147,3 +147,146 @@ f4bc6bcc2c0f: Pushed
 509ce21d6674: Mounted from library/tomcat 
 ```
 
+### pushing registry to azure cloud registy 
+
+```
+[ashu@ip-172-31-31-88 ashu-multistage]$ docker tag  docker.io/dockerashu/oraclespring:ashuv1   ashutoshh.azurecr.io/oraclespring:ashuv1
+[ashu@ip-172-31-31-88 ashu-multistage]$ 
+[ashu@ip-172-31-31-88 ashu-multistage]$ 
+[ashu@ip-172-31-31-88 ashu-multistage]$ docker  login  ashutoshh.azurecr.io  
+Username: ashutoshh
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[ashu@ip-172-31-31-88 ashu-multistage]$ docker push  ashutoshh.azurecr.io/oraclespring:ashuv1
+The push refers to repository [ashutoshh.azurecr.io/oraclespring]
+f4bc6bcc2c0f: Pushed 
+34fa941837a6: Pushed 
+51855650441a: Pushed 
+```
+
+### PRoblem with POd based app deployment 
+
+<img src="podp.png">
+
+## Deployment controller in modern k8s apps 
+
+<img src="deploy.png">
+
+### api resources understading 
+
+<img src="apis.png">
+
+### listing 
+
+```
+[ashu@ip-172-31-31-88 ashu-multistage]$ kubectl  api-resources  
+NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
+bindings                                       v1                                     true         Binding
+componentstatuses                 cs           v1                                     false        ComponentStatus
+configmaps                        cm           v1                                     true         ConfigMap
+```
+
+### creating deployment yaml 
+
+```
+kubectl create deployment  ashu-springapp --image=docker.io/dockerashu/oraclespring:ashuv1   --port 8080  --dry-run=client -o yaml  >deployment1.yaml
+```
+
+### yaml show
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-springapp
+  name: ashu-springapp # name of deployment 
+  namespace: ashu-deploy # optional step 
+spec:
+  replicas: 1 # min number of pod we require 
+  selector:
+    matchLabels:
+      app: ashu-springapp
+  strategy: {}
+  template: # for pod info 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-springapp
+    spec:
+      containers:
+      - image: docker.io/dockerashu/oraclespring:ashuv1
+        name: oraclespring
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
+
+```
+
+### checking this 
+
+```
+ashu@ip-172-31-31-88 k8s-app-deploy]$ ls
+app1.yaml  ashupod1.yaml  autopod.yaml  autopod1.json  deployment1.yaml  hello.yaml  task.yaml
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  apply -f  deployment1.yaml 
+deployment.apps/ashu-springapp created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  deploy 
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-springapp   0/1     1            0           7s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  rs
+NAME                        DESIRED   CURRENT   READY   AGE
+ashu-springapp-67687989c9   1         1         1       13s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get   po 
+NAME                              READY   STATUS    RESTARTS   AGE
+ashu-springapp-67687989c9-ln4b5   1/1     Running   0          17s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### self healing 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get po  -o wide
+NAME                              READY   STATUS    RESTARTS   AGE     IP             NODE      NOMINATED NODE   READINESS GATES
+ashu-springapp-67687989c9-ln4b5   1/1     Running   0          2m51s   192.168.34.1   minion1   <none>           <none>
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl delete pod ashu-springapp-67687989c9-ln4b5 
+pod "ashu-springapp-67687989c9-ln4b5" deleted
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get po  -o wide
+NAME                              READY   STATUS    RESTARTS   AGE   IP             NODE      NOMINATED NODE   READINESS GATES
+ashu-springapp-67687989c9-ksvdz   1/1     Running   0          4s    192.168.34.4   minion1   <none>           <none>
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### scaling pod 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  deploy 
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-springapp   1/1     1            1           3m49s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl scale deployment  ashu-springapp  --replicas 3
+deployment.apps/ashu-springapp scaled
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get po  -o wide
+NAME                              READY   STATUS    RESTARTS   AGE   IP                NODE      NOMINATED NODE   READINESS GATES
+ashu-springapp-67687989c9-fpgpk   1/1     Running   0          5s    192.168.179.198   minion2   <none>           <none>
+ashu-springapp-67687989c9-ksvdz   1/1     Running   0          58s   192.168.34.4      minion1   <none>           <none>
+ashu-springapp-67687989c9-stk7c   1/1     Running   0          5s    192.168.179.199   minion2   <none>           <none>
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl scale deployment  ashu-springapp  --replicas 1
+deployment.apps/ashu-springapp scaled
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get po  -o wide
+NAME                              READY   STATUS    RESTARTS   AGE   IP             NODE      NOMINATED NODE   READINESS GATES
+ashu-springapp-67687989c9-ksvdz   1/1     Running   0          77s   192.168.34.4   minion1   <none>           <none>
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+
+
