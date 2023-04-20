@@ -288,5 +288,72 @@ ashu-springapp-67687989c9-ksvdz   1/1     Running   0          77s   192.168.34.
 
 ```
 
+## Networking 
+
+<img src="calico.png">
+
+### by default all the pods from any namespace are allowed to connect via CNI bridge
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  run test --image=alpine --command sleep 1000 
+pod/test created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  po 
+NAME                              READY   STATUS    RESTARTS   AGE
+ashu-springapp-67687989c9-ksvdz   1/1     Running   0          46m
+test                              1/1     Running   0          3s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl exec -it test -- sh 
+/ # ping 192.168.179.201
+PING 192.168.179.201 (192.168.179.201): 56 data bytes
+64 bytes from 192.168.179.201: seq=0 ttl=63 time=0.201 ms
+64 bytes from 192.168.179.201: seq=1 ttl=63 time=0.119 ms
+64 bytes from 192.168.179.201: seq=2 ttl=63 time=0.113 ms
+^C
+--- 192.168.179.201 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.113/0.144/0.201 ms
+/ # exit
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+```
+
+### Internal Lb is a must thing in k8s networking 
+
+<img src="lb11.png">
+
+### Introduction to service --- for creating internal LB 
+### 4 types of services we are having 
+
+<img src="stype.png">
+
+### creating Nodeport service 
+
+```
+ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get deploy 
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-springapp   2/2     2            2           62m
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  expose  deployment  ashu-springapp  --type NodePort --port 8080 --name ashulb --dry-run=client -o yaml  >nodeport1.yaml 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl config get-contexts 
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin   ashu-deploy
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### Deploy svc 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get  svc 
+No resources found in ashu-deploy namespace.
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  apply -f  nodeport1.yaml 
+service/ashulb created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get  svc 
+NAME     TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ashulb   NodePort   10.109.197.48   <none>        8080:32268/TCP   3s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+
 
 
