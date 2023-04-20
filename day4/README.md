@@ -458,6 +458,88 @@ NAME       READY   STATUS    RESTARTS   AGE
 ashu-app   1/1     Running   0          5s
 [ashu@ip-172-31-31-88 k8s-app-deploy]$ 
 ```
+### Multi resource yaml 
 
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: ashu-k8s1
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashu-pod1
+  name: ashu-pod1
+  namespace: ashu-k8s1 # adding this line 
+spec:
+  containers:
+  - command:
+    - sleep
+    - "10000"
+    image: ubuntu
+    name: ashu-pod1
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc
+  name: ashusvc
+  namespace: ashu-k8s1 # using namespace 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234
+    protocol: TCP
+    targetPort: 80
+    nodePort: 31110 # define port statically 
+  selector:
+    app: ashusvc
+  type: NodePort
+status:
+  loadBalancer: {}
+```
+
+### Deploy this 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f mytask.yaml 
+namespace/ashu-k8s1 created
+pod/ashu-pod1 created
+service/ashusvc created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  po,svc -n ashu-k8s1 
+NAME            READY   STATUS    RESTARTS   AGE
+pod/ashu-pod1   1/1     Running   0          13s
+
+NAME              TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/ashusvc   NodePort   10.102.85.229   <none>        1234:31110/TCP   13s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+
+```
+
+### Destroy 
+
+```
+hu@ip-172-31-31-88 k8s-app-deploy]$ 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectll delete   -f mytask.yaml 
+namespace "ashu-k8s1" deleted
+pod "ashu-pod1" deleted
+service "ashusvc" deleted
+
+
+```
 
 
