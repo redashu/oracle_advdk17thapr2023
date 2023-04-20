@@ -353,7 +353,111 @@ ashulb   NodePort   10.109.197.48   <none>        8080:32268/TCP   3s
 [ashu@ip-172-31-31-88 k8s-app-deploy]$ 
 
 ```
+### creating private image based pod 
 
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl run ashu-app --image=ashutoshh.azurecr.io/oraclespring:ashuv1 --port 8080 --dry-run=client -o yaml >privatepod.yaml 
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### Deploy pod 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f  privatepod.yaml 
+pod/ashu-app created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get  pods
+NAME       READY   STATUS         RESTARTS   AGE
+ashu-app   0/1     ErrImagePull   0          5s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### tracking error using evetns 
+
+```
+hu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get events 
+LAST SEEN   TYPE      REASON      OBJECT         MESSAGE
+77s         Normal    Scheduled   pod/ashu-app   Successfully assigned ashu-deploy/ashu-app to minion2
+39s         Normal    Pulling     pod/ashu-app   Pulling image "ashutoshh.azurecr.io/oraclespring:ashuv1"
+38s         Warning   Failed      pod/ashu-app   Failed to pull image "ashutoshh.azurecr.io/oraclespring:ashuv1": rpc error: code = Unknown desc = failed to pull and unpack image "ashutoshh.azurecr.io/oraclespring:ashuv1": failed to resolve reference "ashutoshh.azurecr.io/oraclespring:ashuv1": failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized
+38s         Warning   Failed      pod/ashu-app   Error: ErrImagePull
+10s         Normal    BackOff     pod/ashu-app   Back-off pulling image "ashutoshh.azurecr.io/oraclespring:ashuv1"
+10s         Warning   Failed      pod/ashu-app   Error: ImagePullBackOff
+```
+
+## Introduction to secret in k8s 
+
+### we are going to store registry credential 
+
+### creating secret to store azure registry auth details 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl create secret 
+Create a secret using specified subcommand.
+
+Available Commands:
+  docker-registry   Create a secret for use with a Docker registry
+  generic           Create a secret from a local file, directory, or literal value
+  tls               Create a TLS secret
+
+Usage:
+```
+
+### 
+
+```
+kubectl create secret docker-registry  ashu-img-sec --docker-server=ashutoshh.azurecr.io --docker-username=ashutoshh --docker-password="Q+wxV" --dry-run=client -o yaml >secret1.yaml 
+```
+
+### namespace orinted secret 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f secret1.yaml 
+secret/ashu-img-sec created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get secrets 
+NAME           TYPE                             DATA   AGE
+ashu-img-sec   kubernetes.io/dockerconfigjson   1      4s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
+### creating pod 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashu-app
+  name: ashu-app
+spec:
+  imagePullSecrets: # calling secret from this namespace 
+  - name: ashu-img-sec 
+  containers:
+  - image: ashutoshh.azurecr.io/oraclespring:ashuv1
+    name: ashu-app
+    ports:
+    - containerPort: 8080
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
+
+### deploy it 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl replace -f privatepod.yaml --force 
+pod "ashu-app" deleted
+pod/ashu-app replaced
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl get  po 
+NAME       READY   STATUS    RESTARTS   AGE
+ashu-app   1/1     Running   0          5s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+```
 
 
 
