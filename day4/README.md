@@ -549,5 +549,90 @@ service "ashusvc" deleted
 
 
 ```
+### more k8s client options 
+<img src="k8sclient.png">
 
+### Deploy k8s webui
+
+```
+ashu@ip-172-31-31-88 ashu-images]$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+namespace/kubernetes-dashboard created
+serviceaccount/kubernetes-dashboard created
+service/kubernetes-dashboard created
+secret/kubernetes-dashboard-certs created
+secret/kubernetes-dashboard-csrf created
+secret/kubernetes-dashboard-key-holder created
+configmap/kubernetes-dashboard-settings created
+role.rbac.authorization.k8s.io/kubernetes-dashboard created
+clusterrole.rbac.authorization.k8s.io/kubernetes-dashboard created
+rolebinding.rbac.authorization.k8s.io/kubernetes-dashboard created
+clusterrolebinding.rbac.authorization.k8s.io/kubernetes-dashboard created
+deployment.apps/kubernetes-dashboard created
+service/dashboard-metrics-scraper created
+deployment.apps/dashboard-metrics-scraper created
+```
+
+### verify 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  deploy -n kubernetes-dashboard 
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+dashboard-metrics-scraper   1/1     1            1           40s
+kubernetes-dashboard        1/1     1            1           40s
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  svc  -n kubernetes-dashboard 
+NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+dashboard-metrics-scraper   ClusterIP   10.98.185.156   <none>        8000/TCP   48s
+kubernetes-dashboard        ClusterIP   10.98.130.169   <none>        443/TCP    48s
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  secret  -n kubernetes-dashboard 
+NAME                              TYPE     DATA   AGE
+kubernetes-dashboard-certs        Opaque   0      58s
+kubernetes-dashboard-csrf         Opaque   1      58s
+kubernetes-dashboard-key-holder   Opaque   2      58s
+```
+
+### changing svc type to NodePort 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  svc  -n kubernetes-dashboard 
+NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+dashboard-metrics-scraper   ClusterIP   10.98.185.156   <none>        8000/TCP   91s
+kubernetes-dashboard        ClusterIP   10.98.130.169   <none>        443/TCP    91s
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl edit  svc   kubernetes-dashboard  -n kubernetes-dashboard 
+service/kubernetes-dashboard edited
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  svc  -n kubernetes-dashboard 
+NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE
+dashboard-metrics-scraper   ClusterIP   10.98.185.156   <none>        8000/TCP        2m19s
+kubernetes-dashboard        NodePort    10.98.130.169   <none>        443:30721/TCP   2m19s
+[ashu@ip-172-31-31-88 ashu-images]$ 
+
+```
+### generating login token of dashboard 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  serviceaccounts  -n kubernetes-dashboard 
+NAME                   SECRETS   AGE
+default                0         4m39s
+kubernetes-dashboard   0         4m39s
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl create token kubernetes-dashboard   -n kubernetes-dashboard 
+eyJhbGciOiJSUzI1NiIsImtpZCI6ImhhU05jUE81V2dBNHNkaXpvU1QxTGVzNGxEeE9GY05KSTVLQTdoMWt1SzQifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiXSwiZXhwIjoxNjgxOTg4MDc4LCJpYXQiOjE2ODE5ODQ0NzgsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsInNlcnZpY2VhY2NvdW50Ijp7Im5hbWUiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsInVpZCI6Ijg4M2I4Y2Y4LWYyNDgtNGM5My05ODVkLTg4MThiYTc0MzU4NyJ9fSwibmJmIjoxNjgxOTg0NDc4LCJzdWIiOiJzeXN0ZW06c2VydmljZWFj
+```
+
+### granting permission to dashboard 
+
+```
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl get  serviceaccounts  -n kubernetes-dashboard 
+NAME                   SECRETS   AGE
+default                0         7m37s
+kubernetes-dashboard   0         7m37s
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ 
+[ashu@ip-172-31-31-88 ashu-images]$ kubectl -n kubernetes-dashboard  create clusterrolebinding  xyz --clusterrole cluster-admin  --serviceaccount=kubernetes-dashboard:kubernetes-dashboard 
+clusterrolebinding.rbac.authorization.k8s.io/xyz created
+[ashu@ip-172-31-31-88 ashu-images]$ 
+
+
+
+```
 
