@@ -636,3 +636,9 @@ clusterrolebinding.rbac.authorization.k8s.io/xyz created
 
 ```
 
+## Introduction to HPA 
+
+<img src="hpa.png">
+
+
+
