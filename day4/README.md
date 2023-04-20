@@ -460,6 +460,14 @@ ashu-app   1/1     Running   0          5s
 ```
 ### Multi resource yaml 
 
+### command to generate yaml 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl create ns  ashu-k8s1 --dry-run=client -o yaml 
+kubectl run ashu-pod1 --image=ubuntu --command sleep 10000 --dry-run=client -o yaml 
+kubectl create  service nodeport ashusvc --tcp 1234:80 --dry-run=client -o yaml
+```
+
 ```
 apiVersion: v1
 kind: Namespace
