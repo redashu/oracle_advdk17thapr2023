@@ -206,6 +206,134 @@ ashu-app-rule   nginx   jaipur.ashutoshh.in             80      4s
 
 ```
 
+## Introduction to storage in docker and k8s 
+
+<img src="k8s.png">
+
+### creating database container without storage
+
+```
+[ashu@ip-172-31-31-88 ~]$ docker run -d --name ashudb1 -e MYSQL_ROOT_PASSWORD="K8s@098#" mysql 
+f1493a153ecb3871fef2cfac11139d895986b89cef2918fa8b342e63e9143c52
+[ashu@ip-172-31-31-88 ~]$ docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                 NAMES
+f1493a153ecb   mysql     "docker-entrypoint.s…"   4 seconds ago   Up 3 seconds   3306/tcp, 33060/tcp   ashudb1
+[ashu@ip-172-31-31-88 ~]$ docker logs  ashudb1
+2023-04-21 06:36:46+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.33-1.el8 started.
+2023-04-21 06:36:46+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2023-04-21 06:36:46+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.33-1.el8 started.
+2023-04-21 06:36:46+00:00 [Note] [Entrypoint]: Initializing database files
+2023-04-21T06:36:46.510781Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is depreca
+```
+
+### accessing db 
+
+```
+ashu@ip-172-31-31-88 ~]$ docker exec -it ashudb1 bash 
+bash-4.4# 
+bash-4.4# 
+bash-4.4# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.33 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> create database hello;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hello              |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> exit;
+Bye
+bash-4.4# exit
+exit
+```
+
+### using docker volumes to create storage
+
+```
+[ashu@ip-172-31-31-88 ~]$ docker volume  create ashudb-vol1
+ashudb-vol1
+[ashu@ip-172-31-31-88 ~]$ docker volume inspect ashudb-vol1
+[
+    {
+        "CreatedAt": "2023-04-21T06:40:42Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/ashudb-vol1/_data",
+        "Name": "ashudb-vol1",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+```
+
+### using volume in mysql container 
+
+```
+[ashu@ip-172-31-31-88 ~]$ docker run -d --name ashudb1 -e MYSQL_ROOT_PASSWORD="K8s@098#"    -v ashudb-vol1:/var/lib/mysql/:rw          mysql 
+86371314514b8093f78d4be42d594791d962ad524edf67cafa5b4b501740fc6a
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ docker  exec -it ashudb1 bash 
+bash-4.4# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.33 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hello              |
+| information_schema |
+| mysql              |
+| oracle             |
+| performance_schema |
+| sys                |
++--------------------+
+6 rows in set (0.00 sec)
+
+mysql> ^DBye
+bash-4.4# exit
+```
 
 
 
