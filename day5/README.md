@@ -334,6 +334,142 @@ mysql> show databases;
 mysql> ^DBye
 bash-4.4# exit
 ```
+### 
+
+```
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ docker volume ls
+DRIVER    VOLUME NAME
+local     5fb04ea878eb0cd9010a08bee8aa793e2946161b41a0d9163df254064c268622
+local     ashudb-vol1
+local     dc5668f7344a2e1706e69a15b393e89eb527b4d8722e200e4f4d56e715374a5f
+local     e3b3a99e8ed71def18daca8f3b86a545dd6e2500754356b405e74eb0670ad9ab
+local     e4d05a3467a074a2f18e2a70698c4a2bb7cd334b7b07be3932ed9180a7120f92
+[ashu@ip-172-31-31-88 ~]$ docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+e3b3a99e8ed71def18daca8f3b86a545dd6e2500754356b405e74eb0670ad9ab
+e4d05a3467a074a2f18e2a70698c4a2bb7cd334b7b07be3932ed9180a7120f92
+5fb04ea878eb0cd9010a08bee8aa793e2946161b41a0d9163df254064c268622
+dc5668f7344a2e1706e69a15b393e89eb527b4d8722e200e4f4d56e715374a5f
+ashudb-vol1
+
+Total reclaimed space: 628.2MB
+[ashu@ip-172-31-31-88 ~]$ 
+
+
+```
+
+### using secret for database password storage purpose 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mydep1
+  name: mydep1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mydep1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mydep1
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        ports:
+        - containerPort: 3306
+        env: 
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-pass
+              key: appx
+        resources: {}
+status: {}
+
+```
+
+### k8s volume can take storage from two type of location 
+
+<img src="stl.png">
+
+### mysql Deployment using hostPath volume 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mydep1
+  name: mydep1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mydep1
+  strategy: {}
+  template: # template 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mydep1
+    spec:
+      volumes: # creating volume 
+      - name: ashudb-vol1 
+        hostPath: # this will take storge from Minion node where pod will be running 
+          path: /opt/ashu-data
+          type: DirectoryOrCreate # if not present then create this directory in node 
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        ports:
+        - containerPort: 3306
+        volumeMounts: # for attaching volume to the container 
+        - name: ashudb-vol1  # name of volume we created above 
+          mountPath: /var/lib/mysql/ # locaiton where to attach 
+        env: 
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-pass
+              key: appx
+        resources: {}
+status: {}
+
+```
+
+### using deployment 
+
+```
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl apply -f secre22.yaml  -f mysql.yaml  
+secret/db-pass configured
+deployment.apps/mydep1 created
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get secrets 
+NAME           TYPE                             DATA   AGE
+ashu-img-sec   kubernetes.io/dockerconfigjson   1      22h
+db-pass        Opaque                           1      14m
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get deploy 
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+mydep1   1/1     1            1           12s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ kubectl  get po 
+NAME                      READY   STATUS    RESTARTS   AGE
+mydep1-7ddfff8475-bbmgw   1/1     Running   0          19s
+[ashu@ip-172-31-31-88 k8s-app-deploy]$ 
+
+```
+
 
 
 
