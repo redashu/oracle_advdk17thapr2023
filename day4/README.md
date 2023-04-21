@@ -804,5 +804,128 @@ ashu-ui   2/2     2            2           8m49s
 [ashu@ip-172-31-31-88 k8s-app-deploy]$ 
 ```
 
+### helm check
+
+```
+ashu@ip-172-31-31-88 ~]$ helm version 
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/ashu/.kube/config
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /home/ashu/.kube/config
+version.BuildInfo{Version:"v3.11.3", GitCommit:"323249351482b3bbfc9f5004f65d400aa70f9ae7", GitTreeState:"clean", GoVersion:"go1.20.3"}
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm version 
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/ashu/.kube/config
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /home/ashu/.kube/config
+version.BuildInfo{Version:"v3.11.3", GitCommit:"323249351482b3bbfc9f5004f65d400aa70f9ae7", GitTreeState:"clean", GoVersion:"go1.20.3"}
+[ashu@ip-172-31-31-88 ~]$ chmod 400 ~/.kube/config 
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm version 
+version.BuildInfo{Version:"v3.11.3", GitCommit:"323249351482b3bbfc9f5004f65d400aa70f9ae7", GitTreeState:"clean", GoVersion:"go1.20.3"}
+[ashu@ip-172-31-31-88 ~]$ 
+
+```
+
+### adding repo 
+
+```
+[ashu@ip-172-31-31-88 ~]$ helm repo list
+Error: no repositories to show
+[ashu@ip-172-31-31-88 ~]$ helm repo add ashu-repo https://charts.bitnami.com/bitnami
+"ashu-repo" has been added to your repositories
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm repo list
+NAME            URL                               
+ashu-repo       https://charts.bitnami.com/bitnami
+[ashu@ip-172-31-31-88 ~]$ 
+
+```
+
+### deploy sample app 
+
+```
+ashu@ip-172-31-31-88 ~]$ helm search repo nginx 
+NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+ashu-repo/nginx                         13.2.34         1.23.4          NGINX Open Source is a web server that can be a...
+ashu-repo/nginx-ingress-controller      9.5.1           1.7.0           NGINX Ingress Controller is an Ingress controll...
+ashu-repo/nginx-intel                   2.1.15          0.4.9           DEPRECATED NGINX Open Source for Intel is a lig...
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm install ashu-deployment  ashu-repo/nginx  
+NAME: ashu-deployment
+LAST DEPLOYED: Fri Apr 21 11:09:38 2023
+NAMESPACE: ashu-deploy
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+### 
+
+```
+[ashu@ip-172-31-31-88 ~]$ helm ls
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+ashu-deployment ashu-deploy     1               2023-04-21 11:09:38.62727675 +0000 UTC  deployed        nginx-13.2.34   1.23.4     
+[ashu@ip-172-31-31-88 ~]$ 
+```
+
+### verify 
+
+```
+p-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ kubectl get deployment 
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-deployment-nginx   1/1     1            1           66s
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  rs
+NAME                               DESIRED   CURRENT   READY   AGE
+ashu-deployment-nginx-5679f9b6c9   1         1         1       75s
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  po
+NAME                                     READY   STATUS    RESTARTS   AGE
+ashu-deployment-nginx-5679f9b6c9-4d64d   1/1     Running   0          78s
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  svc
+NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+ashu-deployment-nginx   LoadBalancer   10.96.251.141   <pending>     80:32763/TCP   80s
+[ashu@ip-172-31-31-88 ~]$ 
+
+```
+
+### 
+
+```
+[ashu@ip-172-31-31-88 ~]$ helm ls
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+ashu-deployment ashu-deploy     1               2023-04-21 11:09:38.62727675 +0000 UTC  deployed        nginx-13.2.34   1.23.4     
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm uninstall ashu-deployment 
+release "ashu-deployment" uninstalled
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ helm ls
+NAME    NAMESPACE       REVISION        UPDATED STATUS  CHART   APP VERSION
+[ashu@ip-172-31-31-88 ~]$ 
+```
+
+#### creating helm chart
+
+```
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ helm create  ashu-charts
+Creating ashu-charts
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ ls
+ashu-charts  ashucm.yaml  deployment.yaml  ingress.yaml  svc.yaml
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ 
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ 
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ cd ashu-charts/
+[ashu@ip-172-31-31-88 ashu-charts]$ ls
+Chart.yaml  charts  templates  values.yaml
+[ashu@ip-172-31-31-88 ashu-charts]$ cd  templates/
+[ashu@ip-172-31-31-88 templates]$ ls
+NOTES.txt  _helpers.tpl  deployment.yaml  hpa.yaml  ingress.yaml  service.yaml  serviceaccount.yaml  tests
+[ashu@ip-172-31-31-88 templates]$ rm -rf *.yaml 
+[ashu@ip-172-31-31-88 templates]$ ls
+NOTES.txt  _helpers.tpl  tests
+[ashu@ip-172-31-31-88 templates]$ rm -rf tests/
+[ashu@ip-172-31-31-88 templates]$ ls
+NOTES.txt  _helpers.tpl
+[ashu@ip-172-31-31-88 templates]$ rm NOTES.txt 
+[ashu@ip-172-31-31-88 templates]$ 
+```
+
 
 
