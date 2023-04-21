@@ -114,5 +114,24 @@ ashu-ui-5b758b774f-9r2wv   1/1     Running   0          11s
 [ashu@ip-172-31-31-88 ingress-using-deployment]$ 
 
 ```
+### creating service 
+
+```
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ ls
+ashucm.yaml  deployment.yaml
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl  get deploy 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-ui   1/1     1            1           7m57s
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl  expose deployment ashu-ui --type ClusterIP --port 1234 --target-port 80 --name lb1  --dry-run=client -o yaml >svc.yaml 
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl apply -f svc.yaml 
+service/lb1 created
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl  get  svc
+NAME   TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+lb1    ClusterIP   10.99.85.52   <none>        1234/TCP   2s
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ 
+
+
+```
+
 
 
