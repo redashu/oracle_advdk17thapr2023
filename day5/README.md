@@ -475,6 +475,94 @@ mydep1-7ddfff8475-bbmgw   1/1     Running   0          19s
 ```
 kubectl create  deployment  ashu-web  --image=wordpress:4.8-apache --port 80 --dry-run=client -o yaml >webfront.yaml
 ```
+## Understanding security concept in k8s --
+
+### RBAC basic
+
+<img src="rbac1.png">
+
+### rbac more 
+
+<img src="rbacm.png">
+
+## Creating a custom namespace for developer 
+
+### step 1  -- creating namespace 
+
+```
+ashu@ip-172-31-31-88 pava-access]$ kubectl create  ns  pavan-dev --dry-run=client -o yaml >ns.yaml 
+[ashu@ip-172-31-31-88 pava-access]$ ls
+ns.yaml
+[ashu@ip-172-31-31-88 pava-access]$ kubectl apply -f ns.yaml 
+namespace/pavan-dev created
+[ashu@ip-172-31-31-88 pava-access]$ 
+
+```
+
+### Understanding kubeconfig file 
+
+```
+849  kubectl config view 
+  850  kubectl config view  --raw 
+```
+
+### service account in k8s 
+
+<img src="sa.png">
+
+### creating sa in k8s namespace 
+
+```
+[ashu@ip-172-31-31-88 pava-access]$ kubectl create serviceaccount  web-access  -n pavan-dev 
+serviceaccount/web-access created
+[ashu@ip-172-31-31-88 pava-access]$ kubectl  get  sa -n pavan-dev 
+NAME         SECRETS   AGE
+default      0         14m
+web-access   0         7s
+[ashu@ip-172-31-31-88 pava-access]$ 
+
+```
+
+### creating role 
+
+```
+[ashu@ip-172-31-31-88 pava-access]$ kubectl create role only-pod-access --resource pods --verb get --verb list -n pavan-dev --dry-run=client -o yaml 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: only-pod-access
+  namespace: pavan-dev
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+[ashu@ip-172-31-31-88 pava-access]$ kubectl create role only-pod-access --resource pods --verb get --verb list -n pavan-dev --dry-run=client -o yaml >role1.yaml
+[ashu@ip-172-31-31-88 pava-access]$ kubectl apply -f role1.yaml 
+role.rbac.authorization.k8s.io/only-pod-access created
+[ashu@ip-172-31-31-88 pava-access]$ kubectl  get roles -n pavan-dev 
+NAME              CREATED AT
+only-pod-access   2023-04-21T10:10:24Z
+[ashu@ip-172-31-31-88 pava-access]$ 
+```
+
+### rolebing 
+
+```
+[ashu@ip-172-31-31-88 pava-access]$ kubectl create rolebinding web-bind1 --role only-pod-access --serviceaccount=pavan-dev:web-accecc -n pavan-dev --dry-run=client -o yaml >bind1.yaml 
+[ashu@ip-172-31-31-88 pava-access]$ kubectl apply -f bind1.yaml 
+rolebinding.rbac.authorization.k8s.io/web-bind1 created
+[ashu@ip-172-31-31-88 pava-access]$ kubectl get rolebindings -n pavan-dev 
+NAME        ROLE                   AGE
+web-bind1   Role/only-pod-access   17s
+[ashu@ip-172-31-31-88 pava-access]$ 
+
+```
+
 
 
 
