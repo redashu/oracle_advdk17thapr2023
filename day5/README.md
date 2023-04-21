@@ -470,6 +470,14 @@ mydep1-7ddfff8475-bbmgw   1/1     Running   0          19s
 
 ```
 
+### creating a web ui so that it can access databased backedn 
+
+```
+kubectl create  deployment  ashu-web  --image=wordpress:4.8-apache --port 80 --dry-run=client -o yaml >webfront.yaml
+```
+
+
+
 
 
 
