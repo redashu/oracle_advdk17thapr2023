@@ -132,6 +132,80 @@ lb1    ClusterIP   10.99.85.52   <none>        1234/TCP   2s
 
 
 ```
+## Deploy nginx ingress controller 
+
+```
+[ashu@ip-172-31-31-88 ~]$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/baremetal/deploy.yaml
+namespace/ingress-nginx created
+serviceaccount/ingress-nginx created
+serviceaccount/ingress-nginx-admission created
+role.rbac.authorization.k8s.io/ingress-nginx created
+role.rbac.authorization.k8s.io/ingress-nginx-admission created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx-admission created
+rolebinding.rbac.authorization.k8s.io/ingress-nginx created
+rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
+clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx created
+clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
+configmap/ingress-nginx-controller created
+service/ingress-nginx-controller create
+```
+
+### verify it 
+
+```
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  po -n ingress-nginx 
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-vmxx9        0/1     Completed   0          49s
+ingress-nginx-admission-patch-x7x5k         0/1     Completed   1          49s
+ingress-nginx-controller-5f49cfd9f9-xvc9j   1/1     Running     0          49s
+[ashu@ip-172-31-31-88 ~]$ 
+[ashu@ip-172-31-31-88 ~]$ kubectl  get  svc  -n ingress-nginx 
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx-controller             NodePort    10.105.121.174   <none>        80:31099/TCP,443:30157/TCP   57s
+ingress-nginx-controller-admission   ClusterIP   10.100.9.241     <none>        443/TCP                      57s
+[ashu@ip-172-31-31-88 ~]$ 
+
+
+```
+
+### creating ingress routing rule in my namespace 
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ashu-app-rule
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx # class name -- using nginx 
+  rules:
+  - host: jaipur.ashutoshh.in 
+    http:
+      paths:
+      - path: / # home path of my app 
+        pathType: Prefix
+        backend:
+          service: # service details 
+            name: lb1
+            port:
+              number: 1234
+```
+
+### Deploy it
+
+```
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl apply -f ingress.yaml 
+ingress.networking.k8s.io/ashu-app-rule created
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ kubectl  get ingress
+NAME            CLASS   HOSTS                 ADDRESS   PORTS   AGE
+ashu-app-rule   nginx   jaipur.ashutoshh.in             80      4s
+[ashu@ip-172-31-31-88 ingress-using-deployment]$ 
+
+
+```
+
 
 
 
